@@ -1,4 +1,4 @@
-![Status](https://img.shields.io/badge/Completed-0/0-yellow)
+![Status](https://img.shields.io/badge/Completed-1/1-green)
 
 # My Advent of Code 2023 Solutions
 
