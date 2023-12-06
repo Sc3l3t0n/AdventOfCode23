@@ -31,11 +31,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "day_03"
+name = "day-06"
 version = "0.1.0"
 
 [[package]]
-name = "day_template"
+name = "day_03"
 version = "0.1.0"
 
 [[package]]
