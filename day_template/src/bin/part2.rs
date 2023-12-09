@@ -1,6 +1,6 @@
 fn main() {
     println!("Part 2");
-    let input = include_str!("./input2.txt");
+    let input = include_str!("../../input.txt");
     let result = solve(input);
     println!("Result = {}", result);
 }
@@ -19,3 +19,4 @@ mod tests {
         assert_eq!(output, "".to_string());
     }
 }
+
