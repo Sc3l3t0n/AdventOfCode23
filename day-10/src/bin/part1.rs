@@ -50,8 +50,8 @@ impl From<char> for Tile {
             '-' => EastWest,
             'L' => NorthEast,
             'J' => NorthWest,
-            '7' => SouthEast,
-            'F' => SouthWest,
+            '7' => SouthWest,
+            'F' => SouthEast,
             'S' => StartingPosition,
             _ => panic!("Unknown tile: {}", c),
         }
@@ -59,98 +59,73 @@ impl From<char> for Tile {
 }
 
 impl Tile {
-    fn get_direction(&self) -> Direction {
-        use Direction::*;
-        match self {
-            Tile::NorthSouth => North,
-            Tile::EastWest => East,
-            Tile::NorthEast => North,
-            Tile::NorthWest => West,
-            Tile::SouthEast => East,
-            Tile::SouthWest => South,
-            _ => panic!("Cannot get direction from tile: {:?}", self),
-        }
-    }
-    fn can_connect(&self, other: Self) -> bool {
-        use Tile::*;
-        match self {
-            NorthSouth => matches!(other, NorthSouth | NorthEast | NorthWest),
-            EastWest => matches!(other, EastWest | NorthEast | SouthEast),
-            NorthEast => matches!(other, NorthSouth | EastWest | NorthEast),
-            NorthWest => matches!(other, NorthSouth | EastWest | NorthWest),
-            SouthEast => matches!(other, NorthSouth | EastWest | SouthEast),
-            SouthWest => matches!(other, NorthSouth | EastWest | SouthWest),
-            StartingPosition => matches!(other, NorthSouth | EastWest | StartingPosition),
-            Ground => false,
-        }
-    }
     fn are_connected(&self, walk_direction: Direction, other: &Self) -> bool {
         match self {
             Tile::StartingPosition => match walk_direction {
                 Direction::North => {
-                    matches!(other, Tile::NorthSouth | Tile::NorthEast | Tile::NorthWest)
-                }
-                Direction::South => {
                     matches!(other, Tile::NorthSouth | Tile::SouthEast | Tile::SouthWest)
                 }
+                Direction::South => {
+                    matches!(other, Tile::NorthSouth | Tile::NorthEast | Tile::NorthWest)
+                }
                 Direction::East => {
-                    matches!(other, Tile::EastWest | Tile::NorthEast | Tile::SouthEast)
+                    matches!(other, Tile::EastWest | Tile::NorthWest | Tile::SouthWest)
                 }
                 Direction::West => {
-                    matches!(other, Tile::EastWest | Tile::NorthWest | Tile::SouthWest)
+                    matches!(other, Tile::EastWest | Tile::NorthEast | Tile::SouthEast)
                 }
             },
             Tile::NorthSouth => match walk_direction {
                 Direction::North => {
-                    matches!(other, Tile::NorthSouth | Tile::NorthEast | Tile::NorthWest)
+                    matches!(other, Tile::NorthSouth | Tile::SouthEast | Tile::SouthWest)
                 }
                 Direction::South => {
-                    matches!(other, Tile::NorthSouth | Tile::SouthEast | Tile::SouthWest)
+                    matches!(other, Tile::NorthSouth | Tile::NorthEast | Tile::NorthWest)
                 }
                 _ => false,
             },
             Tile::EastWest => match walk_direction {
                 Direction::East => {
-                    matches!(other, Tile::EastWest | Tile::NorthEast | Tile::SouthEast)
+                    matches!(other, Tile::EastWest | Tile::NorthWest | Tile::SouthWest)
                 }
                 Direction::West => {
-                    matches!(other, Tile::EastWest | Tile::NorthWest | Tile::SouthWest)
+                    matches!(other, Tile::EastWest | Tile::NorthEast | Tile::SouthEast)
                 }
                 _ => false,
             },
             Tile::NorthEast => match walk_direction {
                 Direction::North => {
-                    matches!(other, Tile::NorthSouth | Tile::EastWest | Tile::NorthEast)
+                    matches!(other, Tile::NorthSouth | Tile::SouthWest | Tile::SouthEast)
                 }
                 Direction::East => {
-                    matches!(other, Tile::EastWest | Tile::NorthEast | Tile::SouthEast)
+                    matches!(other, Tile::EastWest | Tile::NorthWest | Tile::SouthWest)
                 }
                 _ => false,
             },
             Tile::NorthWest => match walk_direction {
                 Direction::North => {
-                    matches!(other, Tile::NorthSouth | Tile::EastWest | Tile::NorthWest)
+                    matches!(other, Tile::NorthSouth | Tile::SouthEast | Tile::SouthWest)
                 }
                 Direction::West => {
-                    matches!(other, Tile::EastWest | Tile::NorthWest | Tile::SouthWest)
+                    matches!(other, Tile::EastWest | Tile::NorthEast | Tile::SouthEast)
                 }
                 _ => false,
             },
             Tile::SouthEast => match walk_direction {
                 Direction::South => {
-                    matches!(other, Tile::NorthSouth | Tile::EastWest | Tile::SouthEast)
+                    matches!(other, Tile::NorthSouth | Tile::NorthWest | Tile::NorthEast)
                 }
                 Direction::East => {
-                    matches!(other, Tile::EastWest | Tile::NorthEast | Tile::SouthEast)
+                    matches!(other, Tile::EastWest | Tile::NorthWest | Tile::SouthWest)
                 }
                 _ => false,
             },
             Tile::SouthWest => match walk_direction {
                 Direction::South => {
-                    matches!(other, Tile::NorthSouth | Tile::EastWest | Tile::SouthWest)
+                    matches!(other, Tile::NorthSouth | Tile::NorthEast | Tile::NorthWest)
                 }
                 Direction::West => {
-                    matches!(other, Tile::EastWest | Tile::NorthWest | Tile::SouthWest)
+                    matches!(other, Tile::EastWest | Tile::NorthEast | Tile::SouthEast)
                 }
                 _ => false,
             },
@@ -159,57 +134,81 @@ impl Tile {
     }
 }
 
-struct Path {
+struct TileMap {
     tiles: Vec<Vec<Tile>>,
+}
+
+impl TileMap {
+    fn get(&self, position: (usize, usize)) -> Option<&Tile> {
+        match &self.tiles.get(position.1) {
+            Some(row) => row.get(position.0),
+            None => None,
+        }
+    }
+}
+
+struct Path {
+    tiles: TileMap,
     starting_position: (usize, usize),
     current_position: (usize, usize),
-    direction: Option<Direction>,
+    path: Vec<(usize, usize)>,
 }
 
 impl Path {
     fn with(tiles: Vec<Vec<Tile>>) -> Self {
         let starting_position = Self::get_starting_position(&tiles);
         Path {
-            tiles,
+            tiles: TileMap { tiles },
             starting_position,
             current_position: (0, 0),
-            direction: None,
+            path: Vec::new(),
+        }
+    }
+    fn setup(&mut self) {
+        let (x, y) = self.starting_position;
+        self.path.push((x, y));
+        for direction in Direction::iter() {
+            let (dx, dy) = direction.get_indices();
+            let pos = (x.saturating_add_signed(dx), y.saturating_add_signed(dy));
+            let tile = self.tiles.get(pos).expect("Should be there");
+            if self
+                .tiles
+                .get(self.starting_position)
+                .expect("Should be there")
+                .are_connected(direction, tile)
+            {
+                self.current_position = pos;
+                self.path.push(pos);
+                break;
+            }
         }
     }
     fn find_farthest_point_steps(&mut self) -> usize {
-        let mut steps = 0;
-        let (x, y) = self.starting_position;
-        let mut connected_tiles = Vec::new();
-        for direction in Direction::iter() {
-            let (dx, dy) = direction.get_indices();
-            let (x, y) = (x.saturating_add_signed(dx), y.saturating_add_signed(dy));
-            let tile = &self.tiles[y][x];
-            if tile.are_connected(direction, &Tile::StartingPosition) {
-                connected_tiles.push((x, y));
+        while self.tiles.get(self.current_position).unwrap() != &Tile::StartingPosition {
+            if let Some(next_pipe) = self.get_next_pipe() {
+                self.current_position = next_pipe;
+            } else {
+                break;
             }
         }
-        self.current_position = *connected_tiles.first().unwrap();
-        while self.tiles[self.current_position.1][self.current_position.0] != Tile::StartingPosition
-        {
-            let next_pipe = self.get_next_pipe().unwrap();
-            self.current_position = next_pipe;
-            steps += 1;
-        }
-        if steps % 2 == 0 {
-            steps / 2
-        } else {
-            steps / 2 + 1
-        }
+        self.path.len() / 2
     }
-    fn get_next_pipe(&self) -> Option<(usize, usize)> {
+    fn get_next_pipe(&mut self) -> Option<(usize, usize)> {
         let (x, y) = self.current_position;
         for direction in Direction::iter() {
             let (dx, dy) = direction.get_indices();
-            let (nx, ny) = (x.saturating_add_signed(dx), y.saturating_add_signed(dy));
-            let tile = &self.tiles[ny][nx];
-            let old_tile = &self.tiles[y][x];
-            if tile.are_connected(direction, old_tile) {
-                return Some((nx, ny));
+            let pos = (x.saturating_add_signed(dx), y.saturating_add_signed(dy));
+            let tile = match self.tiles.get(pos) {
+                Some(tile) => tile,
+                None => continue,
+            };
+            let old_tile = self
+                .tiles
+                .get(self.current_position)
+                .expect("Should be there");
+            if old_tile.are_connected(direction, tile) && !self.path.contains(&pos) {
+                self.path.push(pos);
+                return Some(pos);
             }
         }
         None
@@ -229,6 +228,7 @@ impl Path {
 fn solve(input: &str) -> String {
     let tiles = parse(input);
     let mut path = Path::with(tiles);
+    path.setup();
     let farthest_point = path.find_farthest_point_steps();
     format!("{:?}", farthest_point)
 }
