@@ -1,4 +1,4 @@
-![Status](https://img.shields.io/badge/Completed-11/15-orange)
+![Status](https://img.shields.io/badge/Completed-12/15-orange)
 
 # My Advent of Code 2023 Solutions
 
@@ -21,6 +21,33 @@ To run any of the solutions, you will need Rust installed on your system. Follow
 1. Clone the repository to your local machine.
 2. Navigate to the directory of the day you want to run.
 3. Use `cargo run --bin part1/part2` to compile and execute the program.
+
+## Checklist of days
+
+- [x] Day 1
+- [x] Day 2
+- [x] Day 3
+- [x] Day 4
+- [x] Day 5
+- [x] Day 6
+- [x] Day 7
+- [x] Day 8
+- [x] Day 9
+- [x] Day 10
+- [x] Day 11
+- [ ] Day 12 (hard to get into it)
+- [x] Day 13
+- [ ] Day 14
+- [ ] Day 15
+- [ ] Day 16
+- [ ] Day 17
+- [ ] Day 18
+- [ ] Day 19
+- [ ] Day 20
+- [ ] Day 21
+- [ ] Day 22
+- [ ] Day 23
+- [ ] Day 24
 
 ## Contributions and Feedback
 
